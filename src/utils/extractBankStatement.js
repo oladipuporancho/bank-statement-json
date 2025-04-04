@@ -18,25 +18,8 @@ const extractBankStatement = async (filePath) => {
     // Extract account information
     const accountInfo = {
       accountName: extractPattern(text, /^([A-Z][A-Z\s\-]+)[\r\n]/m),
-      accountNumber: extractPattern(text, /Account Number\s*(\d+)/),
-      statementPeriod: extractPattern(text, /Statement Period\s*([^\r\n]+)/),
-      openingBalance: extractPattern(text, /Opening Balance\s*(NGN [0-9,.]+)/),
-      closingBalance: extractPattern(text, /Closing Balance\s*(NGN [0-9,.]+)/)
+      statementPeriod: extractPattern(text, /Statement Period\s*([^\r\n]+)/)
     };
-
-    // Extract monthly totals
-    const monthlyTotals = [];
-    const yearMonthPattern = /(20\d{2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+NGN\s+([\d,.]+)\s+NGN\s+([\d,.]+)/g;
-
-    let yearMonthMatch;
-    while ((yearMonthMatch = yearMonthPattern.exec(text)) !== null) {
-      monthlyTotals.push({
-        year: yearMonthMatch[1],
-        month: yearMonthMatch[2],
-        totalCredit: `NGN ${yearMonthMatch[3]}`,
-        totalDebit: `NGN ${yearMonthMatch[4]}`
-      });
-    }
 
     // Extract transactions using a more precise approach
     const transactions = [];
@@ -406,7 +389,6 @@ const extractBankStatement = async (filePath) => {
 
     return {
       accountInfo,
-      totals: monthlyTotals,
       transactions,
       message: `Successfully extracted ${transactions.length} transactions from ${filePath}`
     };
